@@ -1,6 +1,6 @@
 {
   "name": "@sbp/okturtles.eventqueue",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A serial event queue for SBP invocations",
   "main": "dist/main.cjs",
   "type": "module",
@@ -52,7 +52,7 @@
     "sinon": "13.0.1"
   },
   "dependencies": {
-    "@sbp/okturtles.data": "0.0.2",
-    "@sbp/sbp": "0.0.1"
+    "@sbp/okturtles.data": "0.0.3",
+    "@sbp/sbp": "1.1.0"
   }
 }
