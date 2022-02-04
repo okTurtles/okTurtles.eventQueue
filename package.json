@@ -1,6 +1,6 @@
 {
   "name": "@sbp/okturtles.eventqueue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Synchronize asynchronous SBP invocations",
   "main": "dist/main.cjs",
   "type": "module",
@@ -47,12 +47,10 @@
     "flow-bin": "0.170.0",
     "flow-remove-types": "2.171.0",
     "mocha": "9.2.0",
-    "should": "13.2.3",
-    "should-sinon": "0.0.6",
-    "sinon": "13.0.1"
+    "should": "13.2.3"
   },
   "dependencies": {
-    "@sbp/okturtles.data": "0.1.0",
-    "@sbp/sbp": "2.0.0"
+    "@sbp/okturtles.data": "0.1.1",
+    "@sbp/sbp": "2.1.0"
   }
 }
