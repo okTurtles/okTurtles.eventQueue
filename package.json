@@ -1,7 +1,7 @@
 {
   "name": "@sbp/okturtles.eventqueue",
-  "version": "0.0.2",
-  "description": "A serial event queue for SBP invocations",
+  "version": "0.1.0",
+  "description": "Synchronize asynchronous SBP invocations",
   "main": "dist/main.cjs",
   "type": "module",
   "exports": {
@@ -18,7 +18,7 @@
   },
   "browserslist": "> 0.25% and not dead",
   "author": "Greg Slepak",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "eslintConfig": {
     "root": true,
     "parser": "@babel/eslint-parser",
@@ -52,7 +52,7 @@
     "sinon": "13.0.1"
   },
   "dependencies": {
-    "@sbp/okturtles.data": "0.0.3",
-    "@sbp/sbp": "1.1.0"
+    "@sbp/okturtles.data": "0.1.0",
+    "@sbp/sbp": "2.0.0"
   }
 }

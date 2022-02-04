@@ -1,6 +1,6 @@
 # `okTurtles.eventQueue`
 
-A serial event queue for [SBP](https://github.com/okTurtles/sbp-js) invocations.
+A serial event queue for asynchronous [SBP](https://github.com/okTurtles/sbp-js) invocations.
 
 Use this to ensure asynchronous SBP invocations get invoked serially, one after another, waiting for the previous invocation to finish completely.
 
@@ -16,12 +16,10 @@ Usage:
 import sbp from '@sbp/sbp'
 import '@sbp/okturtles.eventQueue'
 
-// a modified example from Group Income
 function syncronousHandleEvent (event) {
-  // make sure handleEvent is called AFTER any currently-running invocations
-  // to syncContractWithServer(), to prevent gi.db from throwing
-  // "bad previousHEAD" errors
-  return sbp('okTurtles.eventQueue/queueEvent', event.contractID(), [
+  // here the SBP invocation to 'state/vuex/dispatch' will be
+  // passed to an event queue designed by 'eventQueue-A'
+  return sbp('okTurtles.eventQueue/queueEvent', 'eventQueue-A', [
     'state/vuex/dispatch', 'handleEvent', event
   ])
 }
@@ -37,6 +35,4 @@ See [HISTORY.md](HISTORY.md).
 
 ## License
 
-AGPL-3.0.
-
-See [LICENSE.txt](LICENSE.txt).
+[MIT](LICENSE.txt).
