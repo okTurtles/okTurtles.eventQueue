@@ -1,5 +1,9 @@
 # History
 
+#### 0.1.3
+
+- v0.1.3 - SBP package dependency as '^' version to reduce upgrade / publishing frequency
+
 #### 0.1.2
 
 - reduced size of `dist/main.cjs` by updating `"browserslist"`
