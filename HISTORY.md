@@ -1,5 +1,9 @@
 # History
 
+#### 0.1.5
+
+- SBP 2.2.0 listed as peer dep
+
 #### 0.1.3
 
 - v0.1.3 - SBP package dependency as '^' version to reduce upgrade / publishing frequency
