@@ -14,7 +14,7 @@ var _sbp = _interopRequireDefault(require("@sbp/sbp"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const eventQueues = {};
+const eventQueues = Object.create(null);
 
 var _default = (0, _sbp.default)('sbp/selectors/register', {
   // TODO: define a proper sbpInvocation Flowtype

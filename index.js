@@ -11,7 +11,7 @@
 
 import sbp from '@sbp/sbp'
 
-const eventQueues = {}
+const eventQueues = Object.create(null)
 
 export default (sbp('sbp/selectors/register', {
   // TODO: define a proper sbpInvocation Flowtype
