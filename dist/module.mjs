@@ -28,9 +28,11 @@ export default (sbp('sbp/selectors/register', {
     while (events.length > 0) {
       const event = events[0]
       if (event === thisEvent) {
-        const promise = sbp(...event.sbpInvocation)
-        event.promise = new Promise((accept) => promise.finally(accept))
         try {
+          const promise = sbp(...event.sbpInvocation)
+
+          event.promise = promise instanceof Promise ? new Promise((accept) => promise.finally(accept)) : Promise.resolve()
+
           return await promise
         } finally {
           events.shift()

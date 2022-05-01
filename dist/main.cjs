@@ -36,10 +36,9 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
       const event = events[0];
 
       if (event === thisEvent) {
-        const promise = (0, _sbp.default)(...event.sbpInvocation);
-        event.promise = new Promise(accept => promise.finally(accept));
-
         try {
+          const promise = (0, _sbp.default)(...event.sbpInvocation);
+          event.promise = promise instanceof Promise ? new Promise(accept => promise.finally(accept)) : Promise.resolve();
           return await promise;
         } finally {
           events.shift();
