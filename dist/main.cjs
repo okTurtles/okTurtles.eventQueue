@@ -14,10 +14,7 @@ var _sbp = _interopRequireDefault(require("@sbp/sbp"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const eventQueues = {};
-const STATE_PENDING = 0;
-const STATE_INVOKING = 1;
-const STATE_FINISHED = 2;
+const eventQueues = Object.create(null);
 
 var _default = (0, _sbp.default)('sbp/selectors/register', {
   // TODO: define a proper sbpInvocation Flowtype
@@ -29,26 +26,28 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
     }
 
     const events = eventQueues[name].events;
-    events.push({
+    let accept;
+    const thisEvent = {
       sbpInvocation,
-      state: STATE_PENDING,
-      promise: null
-    });
+      promise: new Promise(a => {
+        accept = a;
+      })
+    };
+    events.push(thisEvent);
 
     while (events.length > 0) {
       const event = events[0];
 
-      if (event.state === STATE_PENDING) {
-        event.state = STATE_INVOKING;
-        event.promise = (0, _sbp.default)(...event.sbpInvocation);
-        await event.promise;
-        event.state = STATE_FINISHED;
-      } else if (event.state === STATE_INVOKING) {
+      if (event === thisEvent) {
+        try {
+          return await (0, _sbp.default)(...event.sbpInvocation);
+        } finally {
+          accept();
+          events.shift();
+        }
+      } else {
         // wait for invocation to finish
         await event.promise;
-      } else {
-        // STATE_FINISHED
-        events.shift();
       }
     }
   }

@@ -11,10 +11,7 @@
 
 import sbp from '@sbp/sbp'
 
-const eventQueues = {}
-const STATE_PENDING = 0
-const STATE_INVOKING = 1
-const STATE_FINISHED = 2
+const eventQueues = Object.create(null)
 
 export default (sbp('sbp/selectors/register', {
   // TODO: define a proper sbpInvocation Flowtype
@@ -23,24 +20,24 @@ export default (sbp('sbp/selectors/register', {
       eventQueues[name] = { events: [] }
     }
     const events = eventQueues[name].events
-    events.push({
+    let accept
+    const thisEvent = {
       sbpInvocation,
-      state: STATE_PENDING,
-      promise: null
-    })
+      promise: new Promise((a) => { accept = a })
+    }
+    events.push(thisEvent)
     while (events.length > 0) {
       const event = events[0]
-      if (event.state === STATE_PENDING) {
-        event.state = STATE_INVOKING
-        event.promise = sbp(...event.sbpInvocation)
-        await event.promise
-        event.state = STATE_FINISHED
-      } else if (event.state === STATE_INVOKING) {
+      if (event === thisEvent) {
+        try {
+          return await sbp(...event.sbpInvocation)
+        } finally {
+          accept()
+          events.shift()
+        }
+      } else {
         // wait for invocation to finish
         await event.promise
-      } else {
-        // STATE_FINISHED
-        events.shift()
       }
     }
   }
