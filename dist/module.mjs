@@ -30,7 +30,7 @@ export default (sbp('sbp/selectors/register', {
       const event = events[0]
       if (event === thisEvent) {
         try {
-          return await Promise.resolve(sbp(...event.sbpInvocation))
+          return await sbp(...event.sbpInvocation)
         } finally {
           accept()
           events.shift()

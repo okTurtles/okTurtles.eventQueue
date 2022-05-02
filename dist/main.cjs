@@ -40,7 +40,7 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
 
       if (event === thisEvent) {
         try {
-          return await Promise.resolve((0, _sbp.default)(...event.sbpInvocation));
+          return await (0, _sbp.default)(...event.sbpInvocation);
         } finally {
           accept();
           events.shift();
