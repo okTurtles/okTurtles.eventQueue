@@ -32,7 +32,7 @@ export default (sbp('sbp/selectors/register', {
         try {
           return await Promise.resolve(sbp(...event.sbpInvocation))
         } finally {
-	  accept()
+          accept()
           events.shift()
         }
       } else {
