@@ -20,21 +20,19 @@ export default (sbp('sbp/selectors/register', {
       eventQueues[name] = { events: [] }
     }
     const events = eventQueues[name].events
+    let accept
     const thisEvent = {
       sbpInvocation,
-      promise: null
+      promise: new Promise((a) => { accept = a })
     }
     events.push(thisEvent)
     while (events.length > 0) {
       const event = events[0]
       if (event === thisEvent) {
         try {
-          const promise = sbp(...event.sbpInvocation)
-
-          event.promise = promise instanceof Promise ? new Promise((accept) => promise.finally(accept)) : Promise.resolve()
-
-          return await promise
+          return await Promise.resolve(sbp(...event.sbpInvocation))
         } finally {
+	  accept()
           events.shift()
         }
       } else {

@@ -26,9 +26,12 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
     }
 
     const events = eventQueues[name].events;
+    let accept;
     const thisEvent = {
       sbpInvocation,
-      promise: null
+      promise: new Promise(a => {
+        accept = a;
+      })
     };
     events.push(thisEvent);
 
@@ -37,10 +40,9 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
 
       if (event === thisEvent) {
         try {
-          const promise = (0, _sbp.default)(...event.sbpInvocation);
-          event.promise = promise instanceof Promise ? new Promise(accept => promise.finally(accept)) : Promise.resolve();
-          return await promise;
+          return await Promise.resolve((0, _sbp.default)(...event.sbpInvocation));
         } finally {
+          accept();
           events.shift();
         }
       } else {
