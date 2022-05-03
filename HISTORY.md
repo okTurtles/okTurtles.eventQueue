@@ -1,5 +1,10 @@
 # History
 
+#### 1.0.0
+
+- `queueEvent` now returns result of invocation ([**@corrideat**](https://github.com/corrideat))
+- Potential deadlock fix ([**@corrideat**](https://github.com/corrideat))
+
 #### 0.1.5
 
 - SBP 2.2.0 listed as peer dep

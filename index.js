@@ -23,7 +23,7 @@ export default (sbp('sbp/selectors/register', {
     let accept
     const thisEvent = {
       sbpInvocation,
-      promise: new Promise((a) => { accept = a })
+      promise: new Promise((resolve) => { accept = resolve })
     }
     events.push(thisEvent)
     while (events.length > 0) {
@@ -32,6 +32,7 @@ export default (sbp('sbp/selectors/register', {
         try {
           return await sbp(...event.sbpInvocation)
         } finally {
+          // $FlowFixMe
           accept()
           events.shift()
         }

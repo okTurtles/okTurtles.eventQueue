@@ -29,8 +29,8 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
     let accept;
     const thisEvent = {
       sbpInvocation,
-      promise: new Promise(a => {
-        accept = a;
+      promise: new Promise(resolve => {
+        accept = resolve;
       })
     };
     events.push(thisEvent);
@@ -42,6 +42,7 @@ var _default = (0, _sbp.default)('sbp/selectors/register', {
         try {
           return await (0, _sbp.default)(...event.sbpInvocation);
         } finally {
+          // $FlowFixMe
           accept();
           events.shift();
         }
