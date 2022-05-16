@@ -16,12 +16,13 @@ Usage:
 import sbp from '@sbp/sbp'
 import '@sbp/okturtles.eventQueue'
 
-function syncronousHandleEvent (event) {
+async function syncronousHandleEvent (event) {
   // here the SBP invocation to 'state/vuex/dispatch' will be
-  // passed to an event queue designed by 'eventQueue-A'
-  return sbp('okTurtles.eventQueue/queueEvent', 'eventQueue-A', [
+  // passed to an event queue designated by 'queue1'
+  const result = await sbp('okTurtles.eventQueue/queueEvent', 'queue1', [
     'state/vuex/dispatch', 'handleEvent', event
   ])
+  return result
 }
 ```
 
