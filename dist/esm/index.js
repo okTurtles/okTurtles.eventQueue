@@ -20,11 +20,11 @@ export default sbp('sbp/selectors/register', {
     },
     'okTurtles.eventQueue/isWaiting': function (name) {
         var _a;
-        return !!((_a = this.eventQueues) === null || _a === void 0 ? void 0 : _a[name].events.length);
+        return !!((_a = this.eventQueues[name]) === null || _a === void 0 ? void 0 : _a.events.length);
     },
     'okTurtles.eventQueue/queuedInvocations': function (name) {
         var _a, _b;
-        return (_b = (_a = this.eventQueues) === null || _a === void 0 ? void 0 : _a[name].events.map((event) => event.sbpInvocation)) !== null && _b !== void 0 ? _b : [];
+        return (_b = (_a = this.eventQueues[name]) === null || _a === void 0 ? void 0 : _a.events.map((event) => event.sbpInvocation)) !== null && _b !== void 0 ? _b : [];
     },
     'okTurtles.eventQueue/queueEvent': function (name, sbpInvocation) {
         if (!Object.prototype.hasOwnProperty.call(this.eventQueues, name)) {

@@ -1,15 +1,19 @@
 import sbp from '@sbp/sbp'
 import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it, mock } from 'node:test'
 import '../dist/esm/index.js'
 
 /**
- * @param [ms] {number}
+ * Returns a promise that resolves after the given milliseconds have elapsed
+ *
+ * @param {number=} ms
  */
 const resolveAfterMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
- * @param [ms] {number}
+ * Returns a promise that rejects after the given milliseconds have elapsed
+ *
+ * @param {number=} ms
  */
 const rejectAfterMs = (ms) => new Promise((resolve, reject) => setTimeout(reject, ms))
 
@@ -17,6 +21,15 @@ sbp('sbp/selectors/register', {
   'okTurtles.eventQueue.test/_init' () {
     this.events = []
   },
+  /**
+   * Test selector to push  the result of a promise into this.events
+   *
+   * @template T
+   * @this {{events: [boolean, unknown][]}}
+   * @param {Promise<void>} promise
+   * @param {T} name
+   * @returns {Promise<T>}
+   */
   'okTurtles.eventQueue.test/push' (promise, name) {
     return promise.then((v) => {
       this.events.push([true, name])
@@ -28,6 +41,10 @@ sbp('sbp/selectors/register', {
       throw e
     })
   },
+  /**
+   * Test selector that returns this.events
+   *
+   * @this {{events: [boolean, unknown][]}} */
   'okTurtles.eventQueue.test/getEvents' () {
     return this.events
   }
@@ -35,9 +52,11 @@ sbp('sbp/selectors/register', {
 
 describe('[SBP] okTurtles.eventQueue domain', () => {
   it('should execute selectors in a queue', async () => {
+    const queueName = 'testQueue-1'
+
     const result = await sbp(
       'okTurtles.eventQueue/queueEvent',
-      'testQueue',
+      queueName,
       ['sbp/selectors/fn', 'sbp/selectors/fn']
     )
 
@@ -45,13 +64,14 @@ describe('[SBP] okTurtles.eventQueue domain', () => {
   })
 
   it('isWaiting returns the correct result', async () => {
-    const invocation = ['okTurtles.eventQueue/isWaiting', 'testQueue']
+    const queueName = 'testQueue-2'
+    const invocation = ['okTurtles.eventQueue/isWaiting', queueName]
 
     assert.equal(sbp(...invocation), false)
 
     const result = await sbp(
       'okTurtles.eventQueue/queueEvent',
-      'testQueue',
+      queueName,
       invocation
     )
 
@@ -61,14 +81,15 @@ describe('[SBP] okTurtles.eventQueue domain', () => {
   })
 
   it('queuedInvocations returns the correct result', async () => {
-    const invocation = ['okTurtles.eventQueue/queuedInvocations', 'testQueue']
+    const queueName = 'testQueue-3'
+    const invocation = ['okTurtles.eventQueue/queuedInvocations', queueName]
 
     assert.deepEqual(sbp(...invocation), [])
 
     const result = await sbp(
       'okTurtles.eventQueue/queueEvent',
-      'testQueue',
-      ['okTurtles.eventQueue/queuedInvocations', 'testQueue']
+      queueName,
+      invocation
     )
 
     assert.deepEqual(result, [invocation])
@@ -77,31 +98,58 @@ describe('[SBP] okTurtles.eventQueue domain', () => {
   })
 
   it('correctly queues multiple events', async () => {
+    const queueName = 'testQueue-4'
     const promiseSettlementSequence = []
 
-    const buildEvent = (name, resolve, ms) => {
-      const promise = resolve ? resolveAfterMs(ms) : rejectAfterMs(ms)
+    /**
+     * Helper function to build and enqueue events
+     *
+     * @template T
+     * @param {string} name - Event name
+     * @param {boolean} succeed - Whether the events succeeds (true) or fails
+     * @param {number=} ms - Time in milliseconds that the event takes to settle
+     * @returns {Promise<T>}
+     */
+    const buildEvent = (name, succeed, ms) => {
+      const promise = succeed ? resolveAfterMs(ms) : rejectAfterMs(ms)
 
-      promise.then(() => {
-        promiseSettlementSequence.push([true, name])
-      }).catch(() => {
-        promiseSettlementSequence.push([false, name])
+      let actual
+      // This ensures that all promises follow the exact same steps regardless
+      // of result, so that the sequence in promiseSettlementSequence is
+      // deterministic.
+      promise.catch(() => {
+        if (actual === undefined) actual = false
+      }).then(() => {
+        if (actual === undefined) actual = true
+      }).finally(() => {
+        promiseSettlementSequence.push([actual, name])
       })
 
       return sbp(
         'okTurtles.eventQueue/queueEvent',
-        'testQueue',
+        queueName,
         ['okTurtles.eventQueue.test/push', promise, name]
       )
     }
 
-    const results = await Promise.allSettled([
-      buildEvent('event1', true, 120),
-      buildEvent('event2', false, 60),
-      buildEvent('event3', true, 80),
-      buildEvent('event4', false, 40),
-      buildEvent('event5', true, 20)
-    ])
+    if (!process.env.TEST_NO_MOCK_TIMERS) {
+      mock.timers.enable(['setTimeout'])
+    }
+
+    const events = [
+      buildEvent('event1', true, 1200),
+      buildEvent('event2', false, 600),
+      buildEvent('event3', true, 800),
+      buildEvent('event4', false, 400),
+      buildEvent('event5', true, 200)
+    ]
+
+    if (!process.env.TEST_NO_MOCK_TIMERS) {
+      mock.timers.tick(1200)
+      mock.timers.reset()
+    }
+
+    const results = await Promise.allSettled(events)
 
     assert.deepEqual(promiseSettlementSequence, [
       [true, 'event5'],

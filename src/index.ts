@@ -21,10 +21,10 @@ export default (sbp('sbp/selectors/register', {
     this.eventQueues = Object.create(null)
   },
   'okTurtles.eventQueue/isWaiting': function (this: ThisType, name: string): boolean {
-    return !!this.eventQueues?.[name].events.length
+    return !!this.eventQueues[name]?.events.length
   },
   'okTurtles.eventQueue/queuedInvocations': function (this: ThisType, name: string): SbpInvocation[] {
-    return this.eventQueues?.[name].events.map((event) => event.sbpInvocation) ?? []
+    return this.eventQueues[name]?.events.map((event) => event.sbpInvocation) ?? []
   },
   'okTurtles.eventQueue/queueEvent': function (this: ThisType, name: string, sbpInvocation: SbpInvocation) {
     if (!Object.prototype.hasOwnProperty.call(this.eventQueues, name)) {
@@ -44,7 +44,7 @@ export default (sbp('sbp/selectors/register', {
               events.shift()
             }
           }
-	  try {
+          try {
             // wait for invocation to finish
             await event.promise
           } catch {
