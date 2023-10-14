@@ -43,9 +43,13 @@ export default (sbp('sbp/selectors/register', {
             } finally {
               events.shift()
             }
-          } else {
+          }
+	  try {
             // wait for invocation to finish
-            await event.promise.catch(Boolean)
+            await event.promise
+          } catch {
+            // do nothing if it fails, since it's not this invocation
+            continue
           }
         }
       })

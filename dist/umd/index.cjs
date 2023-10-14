@@ -58,9 +58,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                                 events.shift();
                             }
                         }
-                        else {
+                        try {
                             // wait for invocation to finish
-                            yield event.promise.catch(Boolean);
+                            yield event.promise;
+                        }
+                        catch (_a) {
+                            // do nothing if it fails, since it's not this invocation
+                            continue;
                         }
                     }
                 }))
