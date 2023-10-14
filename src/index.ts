@@ -35,8 +35,6 @@ export default (sbp('sbp/selectors/register', {
     const thisEvent: EventQueueEvent = {
       sbpInvocation,
       promise: Promise.resolve().then(async () => {
-        events.push(thisEvent)
-
         while (events.length > 0) {
           const event = events[0]
           if (event === thisEvent) {
@@ -52,6 +50,8 @@ export default (sbp('sbp/selectors/register', {
         }
       })
     }
+
+    events.push(thisEvent)
 
     return thisEvent.promise
   }

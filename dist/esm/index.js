@@ -34,7 +34,6 @@ export default sbp('sbp/selectors/register', {
         const thisEvent = {
             sbpInvocation,
             promise: Promise.resolve().then(() => __awaiter(this, void 0, void 0, function* () {
-                events.push(thisEvent);
                 while (events.length > 0) {
                     const event = events[0];
                     if (event === thisEvent) {
@@ -52,6 +51,7 @@ export default sbp('sbp/selectors/register', {
                 }
             }))
         };
+        events.push(thisEvent);
         return thisEvent.promise;
     }
 });
