@@ -1,7 +1,10 @@
 import sbp from '@sbp/sbp'
 import assert from 'node:assert/strict'
-import { describe, it, mock } from 'node:test'
+import { describe, it } from 'node:test'
 import '../dist/esm/index.js'
+
+const { mock } = await import('node:test')
+const timers = mock?.timers
 
 /**
  * Returns a promise that resolves after the given milliseconds have elapsed
@@ -132,8 +135,8 @@ describe('[SBP] okTurtles.eventQueue domain', () => {
       )
     }
 
-    if (!process.env.TEST_NO_MOCK_TIMERS) {
-      mock.timers.enable(['setTimeout'])
+    if (timers && !process.env.TEST_NO_MOCK_TIMERS) {
+      timers.enable(['setTimeout'])
     }
 
     const events = [
@@ -144,9 +147,9 @@ describe('[SBP] okTurtles.eventQueue domain', () => {
       buildEvent('event5', true, 200)
     ]
 
-    if (!process.env.TEST_NO_MOCK_TIMERS) {
-      mock.timers.tick(1200)
-      mock.timers.reset()
+    if (timers && !process.env.TEST_NO_MOCK_TIMERS) {
+      timers.tick(1200)
+      timers.reset()
     }
 
     const results = await Promise.allSettled(events)
