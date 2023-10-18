@@ -2,17 +2,27 @@
   "name": "@sbp/okturtles.eventqueue",
   "version": "1.0.0",
   "description": "Synchronize asynchronous SBP invocations",
-  "main": "dist/main.cjs",
+  "main": "dist/umd/index.js",
+  "module": "dist/esm/index.js",
   "type": "module",
   "exports": {
-    "import": "./dist/module.mjs",
-    "require": "./dist/main.cjs"
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/umd/index.d.ts",
+        "default": "./dist/umd/index.cjs"
+      }
+    }
   },
   "homepage": "https://github.com/okTurtles/okTurtles.eventQueue",
   "scripts": {
-    "test": "mocha --require @babel/register -R spec *.test.js",
-    "build": "babel index.js -o dist/main.cjs && flow-remove-types -p -o dist/module.mjs index.js",
-    "flow": "flow",
+    "test": "node --test --no-warnings=ExperimentalWarning src/index.test.js",
+    "build:esm": "tsc --project tsconfig.json --declaration",
+    "build:umd": "tsc --project tsconfig.umd.json --declaration && mv ./dist/umd/index.js ./dist/umd/index.cjs",
+    "build": "npm run build:esm && npm run build:umd",
     "lint": "eslint",
     "clean": "rm -f dist/*"
   },
@@ -24,12 +34,12 @@
   "license": "MIT",
   "eslintConfig": {
     "root": true,
-    "parser": "@babel/eslint-parser",
+    "parser": "@typescript-eslint/parser",
     "plugins": [
-      "flowtype"
+      "@typescript-eslint"
     ],
     "extends": [
-      "plugin:flowtype/recommended",
+      "plugin:@typescript-eslint/recommended",
       "standard"
     ]
   },
@@ -39,18 +49,9 @@
     "**/*.md"
   ],
   "devDependencies": {
-    "@babel/cli": "7.17.0",
-    "@babel/core": "7.17.0",
-    "@babel/eslint-parser": "7.17.0",
-    "@babel/preset-env": "7.16.11",
-    "@babel/preset-flow": "7.16.7",
-    "@babel/register": "7.17.0",
+    "@typescript-eslint/eslint-plugin": "6.7.5",
     "eslint-config-standard": "17.0.0-0",
-    "eslint-plugin-flowtype": "8.0.3",
-    "flow-bin": "0.170.0",
-    "flow-remove-types": "2.171.0",
-    "mocha": "9.2.0",
-    "should": "13.2.3"
+    "typescript": "5.2.2"
   },
   "dependencies": {
     "@sbp/okturtles.data": "^0.1.5"

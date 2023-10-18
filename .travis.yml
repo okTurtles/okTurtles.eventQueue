@@ -1,6 +1,7 @@
 language: node_js
 node_js:
-  - "16"
+  - "20"
+dist: "focal"
 branches:
   only:
     - master # https://github.com/okTurtles/group-income-simple/issues/58
