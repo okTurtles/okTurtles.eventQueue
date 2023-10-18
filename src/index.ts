@@ -8,12 +8,22 @@
 import type { SbpInvocation } from '@sbp/sbp'
 import sbp from '@sbp/sbp'
 
-type EventQueueEvent = {
+type Callable = typeof Function.prototype
+type EventQueueSbpEvent = {
   sbpInvocation: SbpInvocation;
   promise: Promise<unknown>;
 }
+type EventQueueFnEvent = {
+  fn: Callable;
+  promise: Promise<unknown>;
+}
+type EventQueueEvent = EventQueueSbpEvent | EventQueueFnEvent
 type ThisType = {
-  eventQueues: Record<string, { events: EventQueueEvent[] }>
+  eventQueues: Record<string, EventQueueEvent[]>
+}
+
+const isEventQueueSbpEvent = (e: EventQueueEvent): e is EventQueueSbpEvent => {
+  return Object.prototype.hasOwnProperty.call(e, 'sbpInvocation')
 }
 
 export default (sbp('sbp/selectors/register', {
@@ -21,28 +31,53 @@ export default (sbp('sbp/selectors/register', {
     this.eventQueues = Object.create(null)
   },
   'okTurtles.eventQueue/isWaiting': function (this: ThisType, name: string): boolean {
-    return !!this.eventQueues[name]?.events.length
+    return !!this.eventQueues[name]?.length
   },
-  'okTurtles.eventQueue/queuedInvocations': function (this: ThisType, name: string): SbpInvocation[] {
-    return this.eventQueues[name]?.events.map((event) => event.sbpInvocation) ?? []
+  'okTurtles.eventQueue/queuedInvocations': function (this: ThisType, name?: string | null | undefined): (SbpInvocation | Callable)[] | Record<string, (SbpInvocation | Callable)[]> {
+    if (name == null) {
+      return Object.fromEntries(Object.entries(this.eventQueues).map(([name, events]) => [name, events.map((event) => {
+        if (isEventQueueSbpEvent(event)) {
+          return event.sbpInvocation
+        } else {
+          return event.fn
+        }
+      })]))
+    }
+    return this.eventQueues[name]?.map((event) => {
+      if (isEventQueueSbpEvent(event)) {
+        return event.sbpInvocation
+      } else {
+        return event.fn
+      }
+    }) ?? []
   },
-  'okTurtles.eventQueue/queueEvent': async function (this: ThisType, name: string, sbpInvocation: SbpInvocation) {
+  'okTurtles.eventQueue/queueEvent': async function (this: ThisType, name: string, invocation: SbpInvocation | Callable) {
     if (!Object.prototype.hasOwnProperty.call(this.eventQueues, name)) {
-      this.eventQueues[name] = { events: [] }
+      this.eventQueues[name] = []
     }
 
-    const events = this.eventQueues[name].events
+    const events = this.eventQueues[name]
     let accept: () => void
-    const thisEvent = {
-      sbpInvocation,
-      promise: new Promise<void>((resolve) => { accept = resolve })
-    }
+    const promise = new Promise<void>((resolve) => { accept = resolve })
+    const thisEvent = typeof invocation === 'function'
+      ? {
+          fn: invocation,
+          promise
+        }
+      : {
+          sbpInvocation: invocation,
+          promise
+        }
     events.push(thisEvent)
     while (events.length > 0) {
       const event = events[0]
       if (event === thisEvent) {
         try {
-          return await sbp(...event.sbpInvocation)
+          if (typeof invocation === 'function') {
+            return await invocation()
+          } else {
+            return await sbp(...invocation)
+          }
         } finally {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
