@@ -41,36 +41,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             return (_b = (_a = this.eventQueues[name]) === null || _a === void 0 ? void 0 : _a.events.map((event) => event.sbpInvocation)) !== null && _b !== void 0 ? _b : [];
         },
         'okTurtles.eventQueue/queueEvent': function (name, sbpInvocation) {
-            if (!Object.prototype.hasOwnProperty.call(this.eventQueues, name)) {
-                this.eventQueues[name] = { events: [] };
-            }
-            const events = this.eventQueues[name].events;
-            const thisEvent = {
-                sbpInvocation,
-                promise: Promise.resolve().then(() => __awaiter(this, void 0, void 0, function* () {
-                    while (events.length > 0) {
-                        const event = events[0];
-                        if (event === thisEvent) {
-                            try {
-                                return yield (0, sbp_1.default)(...event.sbpInvocation);
-                            }
-                            finally {
-                                events.shift();
-                            }
-                        }
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!Object.prototype.hasOwnProperty.call(this.eventQueues, name)) {
+                    this.eventQueues[name] = { events: [] };
+                }
+                const events = this.eventQueues[name].events;
+                let accept;
+                const thisEvent = {
+                    sbpInvocation,
+                    promise: new Promise((resolve) => { accept = resolve; })
+                };
+                events.push(thisEvent);
+                while (events.length > 0) {
+                    const event = events[0];
+                    if (event === thisEvent) {
                         try {
-                            // wait for invocation to finish
-                            yield event.promise;
+                            return yield (0, sbp_1.default)(...event.sbpInvocation);
                         }
-                        catch (_a) {
-                            // do nothing if it fails, since it's not this invocation
-                            continue;
+                        finally {
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
+                            accept();
+                            events.shift();
                         }
                     }
-                }))
-            };
-            events.push(thisEvent);
-            return thisEvent.promise;
+                    else {
+                        // wait for invocation to finish
+                        yield event.promise;
+                    }
+                }
+            });
         }
     });
 });

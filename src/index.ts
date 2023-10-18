@@ -26,37 +26,33 @@ export default (sbp('sbp/selectors/register', {
   'okTurtles.eventQueue/queuedInvocations': function (this: ThisType, name: string): SbpInvocation[] {
     return this.eventQueues[name]?.events.map((event) => event.sbpInvocation) ?? []
   },
-  'okTurtles.eventQueue/queueEvent': function (this: ThisType, name: string, sbpInvocation: SbpInvocation) {
+  'okTurtles.eventQueue/queueEvent': async function (this: ThisType, name: string, sbpInvocation: SbpInvocation) {
     if (!Object.prototype.hasOwnProperty.call(this.eventQueues, name)) {
       this.eventQueues[name] = { events: [] }
     }
 
     const events = this.eventQueues[name].events
-    const thisEvent: EventQueueEvent = {
+    let accept: () => void
+    const thisEvent = {
       sbpInvocation,
-      promise: Promise.resolve().then(async () => {
-        while (events.length > 0) {
-          const event = events[0]
-          if (event === thisEvent) {
-            try {
-              return await sbp(...event.sbpInvocation)
-            } finally {
-              events.shift()
-            }
-          }
-          try {
-            // wait for invocation to finish
-            await event.promise
-          } catch {
-            // do nothing if it fails, since it's not this invocation
-            continue
-          }
-        }
-      })
+      promise: new Promise<void>((resolve) => { accept = resolve })
     }
-
     events.push(thisEvent)
-
-    return thisEvent.promise
+    while (events.length > 0) {
+      const event = events[0]
+      if (event === thisEvent) {
+        try {
+          return await sbp(...event.sbpInvocation)
+        } finally {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          accept()
+          events.shift()
+        }
+      } else {
+        // wait for invocation to finish
+        await event.promise
+      }
+    }
   }
 }) as string[])
