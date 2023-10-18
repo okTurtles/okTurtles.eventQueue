@@ -180,4 +180,20 @@ describe('[SBP] okTurtles.eventQueue domain', () => {
       { status: 'fulfilled', value: 'event5' }
     ])
   })
+
+  it('should execute function selectors in a queue', async () => {
+    const queueName = 'testQueue-5'
+    let called = false
+
+    const result = await sbp(
+      'okTurtles.eventQueue/queueEvent',
+      queueName,
+      () => {
+        called = true
+      }
+    )
+
+    assert.equal(typeof result, 'undefined')
+    assert.ok(called)
+  })
 })
