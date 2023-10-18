@@ -1,5 +1,10 @@
 # History
 
+#### 1.2.0
+
+- Added ability to queue a function (in addition to selectors) ([**@corrideat**](https://github.com/corrideat))
+- Improved `'okTurtles.eventQueue/queuedInvocations'` to support showing all queues
+
 #### 1.1.0
 
 - Convert codebase to TypeScript ([**@corrideat**](https://github.com/corrideat))
