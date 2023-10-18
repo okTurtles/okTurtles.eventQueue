@@ -29,6 +29,8 @@ async function syncronousHandleEvent (event) {
 Registers the following selectors:
 
 - `'okTurtles.eventQueue/queueEvent'`
+- `'okTurtles.eventQueue/isWaiting'`
+- `'okTurtles.eventQueue/queuedInvocations'`
 
 ## History
 
