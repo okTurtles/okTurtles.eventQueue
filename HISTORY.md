@@ -1,5 +1,12 @@
 # History
 
+#### 1.1.0
+
+- Convert codebase to TypeScript ([**@corrideat**](https://github.com/corrideat))
+- New selectors for introspection ([**@corrideat**](https://github.com/corrideat)):
+  - `'okTurtles.eventQueue/isWaiting'`
+  - `'okTurtles.eventQueue/queuedInvocations'`
+
 #### 1.0.0
 
 - `queueEvent` now returns result of invocation ([**@corrideat**](https://github.com/corrideat))
