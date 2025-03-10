@@ -1,5 +1,12 @@
 # History
 
+#### 1.2.1
+
+- Add `"types"` field to `package.json`
+- Convert test file to TypeScript
+- Update deps
+
+
 #### 1.2.0
 
 - Added ability to queue a function (in addition to selectors) ([**@corrideat**](https://github.com/corrideat))
