@@ -5,8 +5,8 @@
 // one after another, waiting for the previous invocation to finish completely.
 // =======================
 
-import type { SbpInvocation } from '@sbp/sbp'
 import sbp from '@sbp/sbp'
+type SbpInvocation = Parameters<typeof sbp>
 
 type Callable = typeof Function.prototype
 type EventQueueSbpEvent = {

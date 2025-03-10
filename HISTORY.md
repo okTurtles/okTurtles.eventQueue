@@ -1,5 +1,11 @@
 # History
 
+#### 1.1.1
+
+- Add `"types"` field to `package.json`
+- Convert test file to TypeScript
+- Update deps
+
 #### 1.1.0
 
 - Convert codebase to TypeScript ([**@corrideat**](https://github.com/corrideat))

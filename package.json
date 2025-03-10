@@ -1,30 +1,31 @@
 {
   "name": "@sbp/okturtles.eventqueue",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Synchronize asynchronous SBP invocations",
-  "main": "dist/umd/index.js",
-  "module": "dist/esm/index.js",
+  "types": "dist/umd/index.d.cts",
+  "main": "dist/umd/index.cjs",
+  "module": "dist/esm/index.mjs",
   "type": "module",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/esm/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "types": "./dist/esm/index.d.mts",
+        "default": "./dist/esm/index.mjs"
       },
       "require": {
-        "types": "./dist/umd/index.d.ts",
+        "types": "./dist/umd/index.d.cts",
         "default": "./dist/umd/index.cjs"
       }
     }
   },
   "homepage": "https://github.com/okTurtles/okTurtles.eventQueue",
   "scripts": {
-    "test": "node --test --no-warnings=ExperimentalWarning src/index.test.js",
-    "build:esm": "tsc --project tsconfig.json --declaration",
-    "build:umd": "tsc --project tsconfig.umd.json --declaration && mv ./dist/umd/index.js ./dist/umd/index.cjs",
+    "test": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\")); process.on(\"uncaughtException\", (e) => console.error(\"ERROR\", e));' src/index.test.ts",
+    "build:esm": "tsc --project tsconfig.json --declaration && mv ./dist/esm/index.d.ts ./dist/esm/index.d.mts && mv ./dist/esm/index.js ./dist/esm/index.mjs",
+    "build:umd": "tsc --project tsconfig.umd.json --declaration && mv ./dist/umd/index.d.ts ./dist/umd/index.d.cts && mv ./dist/umd/index.js ./dist/umd/index.cjs",
     "build": "npm run build:esm && npm run build:umd",
     "lint": "eslint",
-    "clean": "rm -f dist/*"
+    "clean": "rm -rf dist/*"
   },
   "browserslist": "> 0.25% and not dead and since 2020",
   "contributors": [
@@ -49,12 +50,10 @@
     "**/*.md"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "6.7.5",
-    "eslint-config-standard": "17.0.0-0",
-    "typescript": "5.2.2"
-  },
-  "dependencies": {
-    "@sbp/okturtles.data": "^0.1.5"
+    "@typescript-eslint/eslint-plugin": "8.26.1",
+    "eslint-config-standard": "17.1.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.8.2"
   },
   "peerDependencies": {
     "@sbp/sbp": "2.x"
